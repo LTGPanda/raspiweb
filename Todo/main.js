@@ -1,7 +1,10 @@
 "use strict";
 
 var data;
-fetch("http://raspberrypi.local/DataBase/Todo.json")
+var timerObj;
+var activCat = "";
+
+fetch("http://255.255.255.255:3000/Todo/")
 .then(response => response.json())
 .then(json => setjson(json));
 
@@ -40,18 +43,30 @@ function setjson(json){
         catClone.addEventListener("click", ()=>{
             while (todersCon.firstChild) {
                 todersCon.removeChild(todersCon.lastChild);
-              }
+            }
             for (let indox = 0; indox < item.List.length; indox++) {
                 const element = item.List[indox];
                 var todersClone = toderex.cloneNode(true);
                 todersClone.querySelector(".todersTitle").textContent = element.Name;
-                todersClone.querySelector(".todersdesc").textContent = element.Description.slice(0,20) + "...";
+
+                var desc = ""
+                var descIndex = element.Description.slice(0,20).search("</br>")
+
+                if(descIndex == -1){
+                    desc = element.Description.slice(0,20) + "...";
+                }
+                else {
+                    desc = element.Description.slice(0,descIndex)
+                }
+
+                todersClone.querySelector(".todersdesc").textContent = desc;
                 todersClone.classList.remove("d-none");
                 todersCon.appendChild(todersClone);
 
                 todersClone.addEventListener("click", ()=>{
+                    activCat = item.Name
                     document.getElementById("Title").textContent = element.Name;
-                    document.getElementById("text").textContent = element.Description;
+                    document.getElementById("text").innerHTML = element.Description;
                     document.getElementById("adding").classList.add("d-none");
                     note.classList.remove("d-none");
                 });
@@ -59,22 +74,57 @@ function setjson(json){
         });
     }
 }
-/*
+
+
+document.getElementById("text").addEventListener("input", (e)=>{
+    clearTimeout(timerObj)
+    timerObj = setTimeout(timerTask, 5000)
+});
+
+function timerTask(){
+    console.log(document.getElementById("text").innerHTML)
+    var theSchmot = document.getElementById("text").children
+    var theSchmeat = ""
+    for (let index = 0; index < theSchmot.length; index++) {
+        const item = theSchmot[index];
+        theSchmeat = theSchmeat + item.textContent + " Bigschlingschlong "
+    }
+
+    theSchmeat = theSchmeat.replace('/', " onkalabonkala ")
+    var theTit = document.getElementById("Title").textContent
+    var argus = {
+        "cat" : activCat,
+        "Title" : theTit,
+        "text" : theSchmeat
+    };
+    console.log(argus.text)
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("POST","http://255.255.255.255:3000/edit/" + JSON.stringify(argus),true);
+    xmlhttp.send();
+}
 
 document.getElementById("addingForm").addEventListener("submit", (event)=>{
     event.preventDefault();
-    console.log(event.target.theShmeat.value);
-    //document.getElementById("adding").classList.add("d-none");
+
+    var theText = event.target.theShmeat.value.replace(/(\r\n|\n|\r)/gm, " Bigschlingschlong ")
+    theText = theSchmeat.replace('/', " onkalabonkala ")
 
     var argus = {
         "cat" : event.target.cater.value,
         "Title" : event.target.tit.value,
-        "text" : event.target.theShmeat.value
+        "text" : theText
     };
     console.log(argus);
 
-    //var note = document.getElementById("note");
-//
-    //note.appendChild(magic);
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.open("POST","http://255.255.255.255:3000/Todo/" + JSON.stringify(argus),true);
+    xmlhttp.send();
+
+    event.target.cater.value = ""
+    event.target.tit.value = ""
+    event.target.theShmeat.value = ""
+
+    document.getElementById("adding").classList.add("d-none");
+    document.getElementById("note").classList.remove("d-none");
+    console.log("lol wowo xf")
 });
-*/

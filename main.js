@@ -8,7 +8,7 @@ mayhaps some todos
 
 let mainBitch = document.getElementById("baseContainer");
 let data;
-fetch("http://raspberrypi.local/DataBase/projanList.json")
+fetch("http://255.255.255.255:3000/")
 .then(response => response.json())
 .then(json => setjson(json));
 
